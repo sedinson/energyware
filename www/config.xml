@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" id="com.coolappz.maps" version="1.0.0">
+<widget xmlns   = "http://www.w3.org/ns/widgets"
+    xmlns:gap   = "http://phonegap.com/ns/1.0"
+    id          = "com.phonegap.energyware"
+    versionCode = "10" 
+    version     = "1.0.0" >
     <name>energyware</name>
     <description>Cordova Application</description>
-    <author email="info@com.coolappz" href="http://www.coolappz.com">edinson</author>
+    <author email="edinsonsalas@gmail.com" href="https://build.phonegap.com">edinson salas</author>
     <access origin="*"/>
     <preference name="webviewbounce" value="true"/>
     <preference name="orientation" value="portrait" />
