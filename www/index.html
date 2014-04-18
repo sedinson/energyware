@@ -94,6 +94,7 @@ and open the template in the editor.
             
             var History = {
                 load: function () {
+                    navigator.notification.alert("aqui les bailo yo", error, 'Error', 'Done');
                     uget({
                         url: LinkServer.Url('history', 'get', {
                             machine     : _machine,
@@ -113,8 +114,6 @@ and open the template in the editor.
                                 $("#date-refresh").html(date[0]);
                                 $("#hour-refresh").html(date[1]);
                             }
-                        } else {
-                            navigator.notification.alert(data._message, error, 'Error', 'Done');
                         }
 
                         setTimeout(function () {
