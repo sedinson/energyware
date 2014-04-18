@@ -47,7 +47,7 @@ and open the template in the editor.
                         })
                     }).done(function (data) {
                         if(data._code === 200) {
-                            $("#list-machine").html("");
+                            $("#list-machine").html("<legend>Equipos relacionados:</legend>");
                             for(var i=0; i<data._response.length; i++) {
                                 var ob = data._response[i];
                                 
@@ -56,7 +56,7 @@ and open the template in the editor.
                                 );
                             }
                             
-                            $("#list-machine input[type='checkbox']").checkboxradio("refresh");
+                            $("#list-machine").trigger("create");
                         }
                     });
                 }
@@ -223,10 +223,7 @@ and open the template in the editor.
                     </div>
                 </form>
                 
-                <fieldset data-role="controlgroup">
-                    <legend>Equipos relacionados:</legend>
-                    <div id="list-machine"></div>
-                </fieldset>
+                <fieldset data-role="controlgroup" id="list-machine"></fieldset>
             </div>
             
             <div data-role="footer" data-theme="b" data-position="fixed">
