@@ -123,6 +123,23 @@ and open the template in the editor.
                 }
             };
             
+            document.addEventListener("deviceready", function () {
+                //Autenticate user
+                uget({
+                    url: LinkServer.Url('user', 'update', []),
+                    type: 'POST',
+                    data: {
+                        uuid     : device.uuid,
+                        platform : device.platform,
+                        model    : device.model,
+                        version  : device.version
+                    }
+                }).done(function (data) {
+                    navigator.notification.alert(data._message, error, 'Error', 'Done');
+                    History.load();
+                });
+            }, false);
+            
             $(function () {
                 //Initialize variables
                 LinkServer = new Linker('http://192.227.159.91/energy/');
@@ -141,21 +158,6 @@ and open the template in the editor.
                 $("#frm-current-machine").submit(function (e) {
                     e.preventDefault();
                     Machine.change($("#frm-current-machine input[name=machine]").val());
-                });
-                
-                //Autenticate user
-                uget({
-                    url: LinkServer.Url('user', 'update', []),
-                    type: 'POST',
-                    data: {
-                        uuid     : device.uuid,
-                        platform : device.platform,
-                        model    : device.model,
-                        version  : device.version
-                    }
-                }).done(function (data) {
-                    navigator.notification.alert(data._message, error, 'Error', 'Done');
-                    History.load();
                 });
             });
             
