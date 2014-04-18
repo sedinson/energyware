@@ -37,7 +37,7 @@ and open the template in the editor.
                     Machine.load();
                 },
                 machine: function () {
-                    $.mobile.changePage('#dialog-filter');
+                    $('#dialog-filter').popup( "open" );
                     Machine.load();
                 }
             };
@@ -87,6 +87,7 @@ and open the template in the editor.
                 },
                 change: function (id) {
                     navigator.notification.alert(id, error, 'Error', 'Done');
+                    $('#dialog-filter').popup( "close" );
                     _machine = id;
                 }
             };
@@ -216,7 +217,7 @@ and open the template in the editor.
                 
                 <div style="clear: both"></div>
                 
-                <p class="subtitle"><i class="utils-info"></i> Estado: <span id="pc-status">online</span></p>
+                <p class="subtitle"><i class="utils-info"></i> Estado: <span id="pc-status">--</span></p>
             </div>
             
             <div data-role="footer" data-theme="b" data-position="fixed">
