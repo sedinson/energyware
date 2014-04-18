@@ -55,6 +55,8 @@ and open the template in the editor.
                                     "<label for='" + ob.idmachine + "'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "' value='" + ob.user + "'>"
                                 );
                             }
+                            
+                            $("#list-machine input[type='checkbox']").checkboxradio("refresh");
                         }
                     });
                 }
@@ -224,12 +226,6 @@ and open the template in the editor.
                 <fieldset data-role="controlgroup">
                     <legend>Equipos relacionados:</legend>
                     <div id="list-machine"></div>
-                    <label for="pc1">PC 1</label>
-                    <input type="checkbox" name="favcolor" id="pc1" value="red">
-                    <label for="computer2">Computer 2</label>
-                    <input type="checkbox" name="favcolor" id="computer2" value="green">
-                    <label for="equipo3">Equipo 3</label>
-                    <input type="checkbox" name="favcolor" id="equipo3" value="blue">
                 </fieldset>
             </div>
             
