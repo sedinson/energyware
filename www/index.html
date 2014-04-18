@@ -38,6 +38,7 @@ and open the template in the editor.
                     $.mobile.defaultPageTransition = 'none';
                 });
                 
+                /*
                 //Create connection to the DB
                 db = window.openDatabase("energyware", "1.0", "EnergyWare Database", 5 * 1024 * 1024);
                 
@@ -51,9 +52,11 @@ and open the template in the editor.
                     tx.executeSql('CREATE TABLE IF NOT EXISTS machine (idmachine unique, user)');
                     tx.executeSql('CREATE TABLE IF NOT EXISTS history (idhistory unique, idmachine, download, upload, cpu, ram, status, date)');
                 }, error, success);
+                */
                 
-                $("#machine-name").html(device.uuid);
                 $("#date-refresh").html("Aqui entro");
+                $("#machine-name").html(device.uuid);
+                
                 
                 //Autenticate user
                 uget({
