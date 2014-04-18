@@ -15,7 +15,6 @@ and open the template in the editor.
 
         <!--Cordova library and plugins-->
         <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="device.js"></script>
         
         <!--Another libraries-->
         <script type="text/javascript" src="libs/js/jquery.min.js"></script>
@@ -27,6 +26,11 @@ and open the template in the editor.
         <!--Main code-->
         <script type="text/javascript">
             var LinkServer = null, db = null, sectores = [];
+            
+            document.addEventListener("deviceready", function () {
+                $("#date-refresh").html("Aqui entro");
+                $("#machine-name").html(device.uuid);
+            }, false);
             
             $(function () {
                 //Initialize variables
@@ -53,9 +57,6 @@ and open the template in the editor.
                     tx.executeSql('CREATE TABLE IF NOT EXISTS history (idhistory unique, idmachine, download, upload, cpu, ram, status, date)');
                 }, error, success);
                 */
-                
-                $("#date-refresh").html("Aqui entro");
-                $("#machine-name").html(device.uuid);
                 
                 
                 //Autenticate user
