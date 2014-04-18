@@ -25,7 +25,7 @@ and open the template in the editor.
         
         <!--Main code-->
         <script type="text/javascript">
-            var LinkServer = null, _machine = 0, _status = {
+            var LinkServer = null, _machine = 0, _machines = [], _status = {
                 1: 'active',
                 2: 'suspended',
                 3: 'inactive'
@@ -43,7 +43,7 @@ and open the template in the editor.
             };
             
             var Machine = {
-                load: function () {
+                load: function (background) {
                     uget({
                         url: LinkServer.Url('machine', 'get', {
                             uuid: device.uuid
@@ -52,9 +52,16 @@ and open the template in the editor.
                         if(data._code === 200) {
                             $("#list-machine").html("<legend>Equipos relacionados:</legend>");
                             $("#current-machine").html("<legend>Seleccione un equipo:</legend>");
+                            if(background) {
+                                _machine = data._response[0].idmachine;
+                            }
+                            
+                            _machines.length = 0;
+                            
                             for(var i=0; i<data._response.length; i++) {
                                 var ob = data._response[i];
                                 
+                                _machines[ob.idmachine] = ob.user;
                                 $("#list-machine").append(
                                     "<label for='" + ob.idmachine + "-1'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "-1' value='" + ob.idmachine + "'>"
                                 );
@@ -86,15 +93,14 @@ and open the template in the editor.
                     });
                 },
                 change: function (id) {
-                    navigator.notification.alert(id, error, 'Error', 'Done');
                     $('#dialog-filter').popup( "close" );
+                    $("#machine-name").html(_machines[id]);
                     _machine = id;
                 }
             };
             
             var History = {
                 load: function () {
-                    navigator.notification.alert("aqui les bailo yo", error, 'Error', 'Done');
                     uget({
                         url: LinkServer.Url('history', 'get', {
                             machine     : _machine,
@@ -135,7 +141,7 @@ and open the template in the editor.
                         version  : device.version
                     }
                 }).done(function (data) {
-                    navigator.notification.alert(data._message, error, 'Error', 'Done');
+                    Machine.load(true);
                     History.load();
                 });
             }, false);
@@ -186,34 +192,34 @@ and open the template in the editor.
 
             <div data-role="content">
                 <h2 class="no-margin-center">
-                    <span id="machine-name">Nombre Equipo</span>
+                    <span id="machine-name">Equipo</span>
                 </h2>
                 
                 <h3 class="no-margin-center">
-                    <span id="hour-refresh">09:12:08</span>
+                    <span id="hour-refresh">00:00:00</span>
                 </h3>
                 <h4 class="no-margin-center">
                     <i class="utils-calendar"></i>
-                    <span id="date-refresh">2014-04-12</span>
+                    <span id="date-refresh">0000-00-00</span>
                 </h4>
                 
                 <div class="full-width-slider">
                     <label class="subtitle"><i class="utils-stats"></i> CPU:</label>
-                    <input type="range" id="cpu-usage" data-highlight="true" min="0" max="100" value="22">
+                    <input type="range" id="cpu-usage" data-highlight="true" min="0" max="100" value="0">
                 </div>
                 
                 <div class="full-width-slider">
                     <label class="subtitle"><i class="utils-stats"></i> RAM:</label>
-                    <input type="range" id="ram-usage" data-highlight="true" min="0" max="100" value="50">
+                    <input type="range" id="ram-usage" data-highlight="true" min="0" max="100" value="0">
                 </div>
                 
                 <p class="subtitle"><i class="utils-stats"></i> Tráfico de Red:</p>
                 <p class="letitbigger">
                     <span class="half">
-                        <i class="utils-download"></i> <b id="download-speed">420Kbps</b>
+                        <i class="utils-download"></i> <b id="download-speed">0Kbps</b>
                     </span>
                     <span class="half">
-                        <i class="utils-upload"></i> <b id="upload-speed">60Kbps</b>
+                        <i class="utils-upload"></i> <b id="upload-speed">0Kbps</b>
                     </span>
                 </p>
                 
