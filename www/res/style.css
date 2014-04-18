@@ -74,6 +74,9 @@ form.overflow .half:nth-of-type(2) {
     height: 90%;
 }
 
-#no-machines-message {
+#no-machines-message, #valuables {
     display: none;
+}
+#no-machines-message h2 {
+    font-size: 2.0em;
 }

@@ -119,7 +119,9 @@ and open the template in the editor.
                             machine: machine
                         })
                     }).done(function (data) {
-                        if(data._code !== 200) {
+                        if(data._code === 200) {
+                            Machine.load();
+                        }else {
                             navigator.notification.alert(data._message, error, 'Error', 'Done');
                         }
                     });
@@ -203,9 +205,14 @@ and open the template in the editor.
             
             //Eliminar las relaciones creadas
             function remove_relations () {
+                var values = [];
                 $("#list-machine input:checked").each(function(i){
-                    Machine.remove($(this).val());
+                    values.push($(this).val());
                 });
+                
+                for(var i=0; i<values.length; i++) {
+                    Machine.remove(values[i]);
+                }
             }
 
             // Transaction error callback
