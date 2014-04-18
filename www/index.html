@@ -52,8 +52,27 @@ and open the template in the editor.
                         if(data._code === 200) {
                             $("#list-machine").html("<legend>Equipos relacionados:</legend>");
                             $("#current-machine").html("<legend>Seleccione un equipo:</legend>");
-                            if(background) {
-                                _machine = data._response[0].idmachine;
+                            if(data._response.length > 0) {
+                                $("#no-machines-message").css({
+                                    display: 'none'
+                                });
+                                
+                                $("#valuables").css({
+                                    display: 'block'
+                                });
+                                
+                                if(background) {
+                                    _machine = data._response[0].idmachine;
+                                    $("#machine-name").html(data._response[0].user);
+                                }
+                            } else {
+                                $("#no-machines-message").css({
+                                    display: 'block'
+                                });
+                                
+                                $("#valuables").css({
+                                    display: 'none'
+                                });
                             }
                             
                             _machines.length = 0;
@@ -112,8 +131,8 @@ and open the template in the editor.
                                 var ob = data._response[0],
                                     dated = ob.date.split(' ');
                                 
-                                $("#cpu-usage").val(ob.cpu);
-                                $("#ram-usage").val(ob.ram);
+                                $("#cpu-usage").val(ob.cpu).slider("refresh");;
+                                $("#ram-usage").val(ob.ram).slider("refresh");;
                                 $("#download-speed").html(ob.download + "Kbps");
                                 $("#upload-speed").html(ob.upload + "Kbps");
                                 $("#pc-status").html(_status[ob.status]);
@@ -191,41 +210,47 @@ and open the template in the editor.
             </div>
 
             <div data-role="content">
-                <h2 class="no-margin-center">
-                    <span id="machine-name">Equipo</span>
-                </h2>
-                
-                <h3 class="no-margin-center">
-                    <span id="hour-refresh">00:00:00</span>
-                </h3>
-                <h4 class="no-margin-center">
-                    <i class="utils-calendar"></i>
-                    <span id="date-refresh">0000-00-00</span>
-                </h4>
-                
-                <div class="full-width-slider">
-                    <label class="subtitle"><i class="utils-stats"></i> CPU:</label>
-                    <input type="range" id="cpu-usage" data-highlight="true" min="0" max="100" value="0">
+                <div id="no-machines-message">
+                    <h2>No hay Equipos</h2>
+                    <p>Para agregar un nuevo equipo presione en el botón de abajo llamado 'Rel.'</p>
                 </div>
-                
-                <div class="full-width-slider">
-                    <label class="subtitle"><i class="utils-stats"></i> RAM:</label>
-                    <input type="range" id="ram-usage" data-highlight="true" min="0" max="100" value="0">
+                <div id="valuables">
+                    <h2 class="no-margin-center">
+                        <span id="machine-name">Equipo</span>
+                    </h2>
+
+                    <h3 class="no-margin-center">
+                        <span id="hour-refresh">00:00:00</span>
+                    </h3>
+                    <h4 class="no-margin-center">
+                        <i class="utils-calendar"></i>
+                        <span id="date-refresh">0000-00-00</span>
+                    </h4>
+
+                    <div class="full-width-slider">
+                        <label class="subtitle"><i class="utils-stats"></i> CPU:</label>
+                        <input type="range" id="cpu-usage" data-highlight="true" min="0" max="100" value="0">
+                    </div>
+
+                    <div class="full-width-slider">
+                        <label class="subtitle"><i class="utils-stats"></i> RAM:</label>
+                        <input type="range" id="ram-usage" data-highlight="true" min="0" max="100" value="0">
+                    </div>
+
+                    <p class="subtitle"><i class="utils-stats"></i> Tráfico de Red:</p>
+                    <p class="letitbigger">
+                        <span class="half">
+                            <i class="utils-download"></i> <b id="download-speed">0Kbps</b>
+                        </span>
+                        <span class="half">
+                            <i class="utils-upload"></i> <b id="upload-speed">0Kbps</b>
+                        </span>
+                    </p>
+
+                    <div style="clear: both"></div>
+
+                    <p class="subtitle"><i class="utils-info"></i> Estado: <span id="pc-status">--</span></p>
                 </div>
-                
-                <p class="subtitle"><i class="utils-stats"></i> Tráfico de Red:</p>
-                <p class="letitbigger">
-                    <span class="half">
-                        <i class="utils-download"></i> <b id="download-speed">0Kbps</b>
-                    </span>
-                    <span class="half">
-                        <i class="utils-upload"></i> <b id="upload-speed">0Kbps</b>
-                    </span>
-                </p>
-                
-                <div style="clear: both"></div>
-                
-                <p class="subtitle"><i class="utils-info"></i> Estado: <span id="pc-status">--</span></p>
             </div>
             
             <div data-role="footer" data-theme="b" data-position="fixed">
