@@ -64,6 +64,7 @@ and open the template in the editor.
                                 if(background) {
                                     _machine = data._response[0].idmachine;
                                     $("#machine-name").html(data._response[0].user);
+                                    History.load();
                                 }
                             } else {
                                 $("#no-machines-message").css({
@@ -82,7 +83,7 @@ and open the template in the editor.
                                 
                                 _machines[ob.idmachine] = ob.user;
                                 $("#list-machine").append(
-                                    "<label for='" + ob.idmachine + "-1'>" + ob.user + "</label><input type='checkbox' name='machine[]' id='" + ob.idmachine + "-1' value='" + ob.idmachine + "'>"
+                                    "<label for='" + ob.idmachine + "-1'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "-1' value='" + ob.idmachine + "'>"
                                 );
                         
                                 $("#current-machine").append(
@@ -118,9 +119,7 @@ and open the template in the editor.
                             machine: machine
                         })
                     }).done(function (data) {
-                        if(data._code === 200) {
-                            Machine.load();
-                        } else {
+                        if(data._code !== 200) {
                             navigator.notification.alert(data._message, error, 'Error', 'Done');
                         }
                     });
@@ -154,11 +153,13 @@ and open the template in the editor.
                                 $("#hour-refresh").html(dated[1]);
                             }
                         }
-
-                        setTimeout(function () {
-                            History.load();
-                        }, 10000);
                     });
+                },
+                auto: function () {
+                    History.load();
+                    setTimeout(function () {
+                        History.auto();
+                    }, 10000);
                 }
             };
             
@@ -175,7 +176,7 @@ and open the template in the editor.
                     }
                 }).done(function (data) {
                     Machine.load(true);
-                    History.load();
+                    History.auto();
                 });
             }, false);
             
@@ -202,7 +203,7 @@ and open the template in the editor.
             
             //Eliminar las relaciones creadas
             function remove_relations () {
-                $("#list-machine :checkbox:checked").each(function(i){
+                $("#list-machine input:checked").each(function(i){
                     Machine.remove($(this).val());
                 });
             }
@@ -215,9 +216,7 @@ and open the template in the editor.
             // Transaction success callback
             function success() {}
 
-            function initialize() {
-                //generatePol();
-            }
+            function initialize() {}
         </script>
     </head>
     <body>
