@@ -104,15 +104,15 @@ and open the template in the editor.
                         if(data._code === 200) {
                             if(data._response.length > 0) {
                                 var ob = data._response[0],
-                                    date = ob.date.split(' ');
+                                    dated = ob.date.split(' ');
                                 
                                 $("#cpu-usage").val(ob.cpu);
                                 $("#ram-usage").val(ob.ram);
                                 $("#download-speed").html(ob.download + "Kbps");
                                 $("#upload-speed").html(ob.upload + "Kbps");
                                 $("#pc-status").html(_status[ob.status]);
-                                $("#date-refresh").html(date[0]);
-                                $("#hour-refresh").html(date[1]);
+                                $("#date-refresh").html(dated[0]);
+                                $("#hour-refresh").html(dated[1]);
                             }
                         }
 
@@ -154,6 +154,7 @@ and open the template in the editor.
                         version  : device.version
                     }
                 }).done(function (data) {
+                    navigator.notification.alert(data._message, error, 'Error', 'Done');
                     History.load();
                 });
             });
