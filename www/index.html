@@ -25,7 +25,11 @@ and open the template in the editor.
         
         <!--Main code-->
         <script type="text/javascript">
-            var LinkServer = null, db = null, sectores = [];
+            var LinkServer = null, _machine = 0, _status = {
+                1: 'active',
+                2: 'suspended',
+                3: 'inactive'
+            };
             
             document.addEventListener("deviceready", function () {
                 $("#date-refresh").html("Aqui entro");
@@ -48,19 +52,74 @@ and open the template in the editor.
                     }).done(function (data) {
                         if(data._code === 200) {
                             $("#list-machine").html("<legend>Equipos relacionados:</legend>");
+                            $("#current-machine").html("<legend>Seleccione un equipo:</legend>");
                             for(var i=0; i<data._response.length; i++) {
                                 var ob = data._response[i];
                                 
                                 $("#list-machine").append(
-                                    "<label for='" + ob.idmachine + "'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "' value='" + ob.user + "'>"
+                                    "<label for='" + ob.idmachine + "-1'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "-1' value='" + ob.idmachine + "'>"
+                                );
+                        
+                                $("#current-machine").append(
+                                    "<label for='" + ob.idmachine + "-2'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "-2' value='" + ob.idmachine + "'>"
                                 );
                             }
                             
+                            $("#current-machine").trigger("create");
                             $("#list-machine").trigger("create");
                         }
                     });
+                },
+                relation: function (machine) {
+                    uget({
+                        url: LinkServer.Url('machine', 'add_relation'),
+                        type: 'POST',
+                        data: {
+                            uuid: device.uuid,
+                            machine: machine
+                        }
+                    }).done(function (data) {
+                        if(data._code === 200) {
+                            Machine.load();
+                        } else {
+                            navigator.notification.alert(data._message, 'Error', 'Done');
+                        }
+                    });
+                },
+                change: function (id) {
+                    _machine = id;
                 }
             };
+            
+            var History = {
+                load: function () {
+                    uget({
+                        url: LinkServer.Url('history', 'get', {
+                            machine     : _machine,
+                            uuid        : device.uuid
+                        })
+                    }).done(function (data) {
+                        if(data._code === 200) {
+                            if(data._response.length > 0) {
+                                var ob = data._response[0],
+                                    date = ob.date.split(' ');
+                                
+                                $("#cpu-usage").val(ob.cpu);
+                                $("#ram-usage").val(ob.ram);
+                                $("#download-speed").html(ob.download + "Kbps");
+                                $("#upload-speed").html(ob.upload + "Kbps");
+                                $("#pc-status").html(_status[ob.status]);
+                                $("#date-refresh").html(date[0]);
+                                $("#hour-refresh").html(date[1]);
+                            }
+                        }
+
+                        setTimeout(function () {
+                            History.load();
+                        }, 10000);
+                    });
+                }
+            }
             
             $(function () {
                 //Initialize variables
@@ -70,6 +129,16 @@ and open the template in the editor.
                 //Remove transitions
                 $(document).bind('pageinit', function () {
                     $.mobile.defaultPageTransition = 'none';
+                });
+                
+                $("#frm-relations").submit(function (e) {
+                    e.preventDefault();
+                    Machine.relation($("#idmachine").val());
+                });
+                
+                $("#frm-current-machine").submit(function (e) {
+                    e.preventDefault();
+                    Machine.change($(this).find("input [name=machine]").val());
                 });
                 
                 //Autenticate user
@@ -84,27 +153,10 @@ and open the template in the editor.
                     }
                 }).done(function (data) {
                     if(data._code === 200) {
-                        updateInfo();
+                        History.load();
                     }
                 });
             });
-            
-            function updateInfo () {
-                uget({
-                    url: LinkServer.Url('history', 'get', {
-                        idhistory   : idhistory,
-                        uuid        : device.uuid
-                    })
-                }).done(function (data) {
-                    if(data._code === 200) {
-                        if(data._response.length > 0) {
-                            var ob = data._response[0];
-                        }
-                    }
-                    
-                    setTimeout(updateInfo, 10000);
-                });
-            }
             
             
 
@@ -149,7 +201,7 @@ and open the template in the editor.
                 
                 <div class="full-width-slider">
                     <label class="subtitle"><i class="utils-stats"></i> RAM:</label>
-                    <input type="range" id="slider-12" data-highlight="true" min="0" max="100" value="50">
+                    <input type="range" id="ram-usage" data-highlight="true" min="0" max="100" value="50">
                 </div>
                 
                 <p class="subtitle"><i class="utils-stats"></i> Tráfico de Red:</p>
@@ -182,17 +234,9 @@ and open the template in the editor.
                     <h1>Seleccione...</h1>
                 </div>
                 
-                <form method="post" action="demoform.asp">
+                <form method="post" id="frm-current-machine">
                     <div data-role="main" class="ui-content">
-                        <fieldset data-role="controlgroup">
-                            <legend>Seleccione los barrios a mostrar:</legend>
-                            <label for="red">PC 1</label>
-                            <input type="radio" name="favcolor" id="red" value="red">
-                            <label for="green">Computer 2</label>
-                            <input type="radio" name="favcolor" id="green" value="green">
-                            <label for="blue">Equipo 3</label>
-                            <input type="radio" name="favcolor" id="blue" value="blue">	
-                        </fieldset>
+                        <fieldset data-role="controlgroup" id="current-machine"></fieldset>
                     </div>
                     
                     <div data-role="footer" data-theme="b">
@@ -215,7 +259,7 @@ and open the template in the editor.
             <div data-role="content">
                 <form class="overflow" id="frm-relations">
                     <div class="half">
-                        <input placeholder="Código" type="text" name="code" />
+                        <input placeholder="Código" id="idmachine" type="text" name="code" />
                     </div>
 
                     <div class="half">
