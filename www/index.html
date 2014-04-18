@@ -202,7 +202,7 @@ and open the template in the editor.
                 
                 $("#frm-current-machine").submit(function (e) {
                     e.preventDefault();
-                    Machine.change($("#frm-current-machine input[name=machine]").val());
+                    Machine.change($("#frm-current-machine input[name=machine]:checked").val());
                 });
             });
             
