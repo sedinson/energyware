@@ -45,6 +45,8 @@ and open the template in the editor.
                     tx.executeSql('CREATE TABLE IF NOT EXISTS history (idhistory unique, idmachine, download, upload, cpu, ram, status, date)');
                 }, error, success);
                 
+                $("#machine-name").html(device.uuid);
+                
                 //Autenticate user
                 uget({
                     url: LinkServer.Url('user', 'update', []),
