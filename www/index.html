@@ -113,6 +113,8 @@ and open the template in the editor.
                                 $("#date-refresh").html(date[0]);
                                 $("#hour-refresh").html(date[1]);
                             }
+                        } else {
+                            navigator.notification.alert(data._message, error, 'Error', 'Done');
                         }
 
                         setTimeout(function () {
@@ -139,7 +141,7 @@ and open the template in the editor.
                 
                 $("#frm-current-machine").submit(function (e) {
                     e.preventDefault();
-                    Machine.change($(this).find("input [name=machine]").val());
+                    Machine.change($("#frm-current-machine input[name=machine]").val());
                 });
                 
                 //Autenticate user
