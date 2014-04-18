@@ -43,7 +43,7 @@ and open the template in the editor.
             };
             
             var Machine = {
-                load: function (background) {
+                load: function () {
                     uget({
                         url: LinkServer.Url('machine', 'get', {
                             uuid: device.uuid
@@ -61,7 +61,7 @@ and open the template in the editor.
                                     display: 'block'
                                 });
                                 
-                                if(_machine === 0 || _machine === null || background) {
+                                if(_machine === 0 || _machine === null) {
                                     _machine = data._response[0].idmachine;
                                     $("#machine-name").html(data._response[0].user);
                                     History.load();
@@ -127,9 +127,11 @@ and open the template in the editor.
                     });
                 },
                 change: function (id) {
-                    $('#dialog-filter').popup( "close" );
                     $("#machine-name").html(_machines[id]);
                     _machine = id;
+                    History.load();
+                    
+                    $('#dialog-filter').popup( "close" );
                 }
             };
             
@@ -159,6 +161,7 @@ and open the template in the editor.
                 },
                 auto: function () {
                     History.load();
+                    
                     setTimeout(function () {
                         History.auto();
                     }, 10000);
@@ -177,7 +180,7 @@ and open the template in the editor.
                         version  : device.version
                     }
                 }).done(function (data) {
-                    Machine.load(true);
+                    Machine.load();
                     History.auto();
                 });
             }, false);
