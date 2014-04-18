@@ -82,7 +82,7 @@ and open the template in the editor.
                                 
                                 _machines[ob.idmachine] = ob.user;
                                 $("#list-machine").append(
-                                    "<label for='" + ob.idmachine + "-1'>" + ob.user + "</label><input type='checkbox' name='machine' id='" + ob.idmachine + "-1' value='" + ob.idmachine + "'>"
+                                    "<label for='" + ob.idmachine + "-1'>" + ob.user + "</label><input type='checkbox' name='machine[]' id='" + ob.idmachine + "-1' value='" + ob.idmachine + "'>"
                                 );
                         
                                 $("#current-machine").append(
@@ -103,6 +103,20 @@ and open the template in the editor.
                             uuid: device.uuid,
                             machine: machine
                         }
+                    }).done(function (data) {
+                        if(data._code === 200) {
+                            Machine.load();
+                        } else {
+                            navigator.notification.alert(data._message, error, 'Error', 'Done');
+                        }
+                    });
+                },
+                remove: function (machine) {
+                    uget({
+                        url: LinkServer.Url('machine', 'remove_relation', {
+                            uuid: device.uuid,
+                            machine: machine
+                        })
                     }).done(function (data) {
                         if(data._code === 200) {
                             Machine.load();
@@ -186,7 +200,12 @@ and open the template in the editor.
                 });
             });
             
-            
+            //Eliminar las relaciones creadas
+            function removeRelations () {
+                $("#list-machine :checkbox:checked").each(function(i){
+                    Machine.remove($(this).val());
+                });
+            }
 
             // Transaction error callback
             function error(err) {
@@ -306,7 +325,7 @@ and open the template in the editor.
             
             <div data-role="footer" data-theme="b" data-position="fixed">
                 <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
-                    <button data-icon="delete">Eliminar Relaciones</button>
+                    <button data-icon="delete" onclick="javascript: remove_relations();">Eliminar Relaciones</button>
                 </fieldset>
             </div>
         </div>
