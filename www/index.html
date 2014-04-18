@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>EnergyWare - Main</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="stylesheet" href="res/jquery-mobile.min.css" />
+        <link rel="stylesheet" href="res/style.css" />
+        <link rel="stylesheet" href="res/utils.css" />
+
+        <script type="text/javascript" src="libs/js/jquery.min.js"></script>
+        <script type="text/javascript" src="libs/js/jquery-mobile.min.js"></script>
+        <script type="text/javascript" src="libs/js/highcharts.js"></script>
+        <script type="text/javascript" src="libs/js/highcharts-more.js"></script>
+        <script type="text/javascript" src="libs/js/projectbase.js"></script>
+        <script type="text/javascript">
+            var LinkServer = null, db = null, map, sectores = [];
+            
+            $(function () {
+                //Initialize variables
+                LinkServer = new Linker('http://192.227.159.91/pot/');
+                LinkServer.setExtension(".json?");
+                
+                //Remove transitions
+                $(document).bind('pageinit', function () {
+                    $.mobile.defaultPageTransition = 'none';
+                });
+                
+                //Create connection to the DB
+                db = window.openDatabase("pot", "1.0", "POT Database", 5 * 1024 * 1024);
+                
+                //Create tables to the DB
+                db.transaction(function (tx) {
+                    //tx.executeSql('DROP TABLE IF EXISTS version');
+                    //tx.executeSql('DROP TABLE IF EXISTS sector');
+                    //tx.executeSql('DROP TABLE IF EXISTS puntos');
+                    //tx.executeSql('DROP TABLE IF EXISTS valores');
+                    
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS version (idversion unique, version)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS sector (idsector unique, nombre, tipo)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS puntos (idpuntos unique, idsector, x, y)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS valores (idvalores unique, idsector, mes, min, max, prom)');
+                    
+                    //Find for a new version of data
+                    tx.executeSql('INSERT OR IGNORE INTO version (idversion, version) VALUES (?, ?)', [1, 0]);
+                    tx.executeSql('SELECT version FROM version', [], updateVersion);
+                }, error, success);
+            });
+            
+            function updateVersion (_tx, result) {
+                //Get the last version on the application
+                var version = (result.rows.length > 0)? result.rows.item(0).version : 0;
+                
+                //Find on the server for a new version
+                uget({
+                    url: LinkServer.Url('version', 'ref')
+                }).done(function (data) {
+                    //If a new version was found, update!
+                    var updated = [false, false, false];
+                    
+                    if(data._response.version > version) {
+                        console.log("A new version was Found! Updating...");
+                        
+                        //Delete old information and update the version ID
+                        db.transaction(function (tx) {
+                            tx.executeSql('UPDATE version SET version = ? WHERE idversion = 1', [data._response.version]);
+                            tx.executeSql('DELETE FROM valores WHERE idvalores > 0');
+                            tx.executeSql('DELETE FROM puntos WHERE idpuntos > 0');
+                            tx.executeSql('DELETE FROM sector WHERE idsector > 0');
+                        });
+                        
+                        //Get the new sector
+                        uget({
+                            url: LinkServer.Url('sector', 'get')
+                        }).done(function (data) {
+                            db.transaction(function (tx) {
+                                for(var i in data._response) {
+                                    var ob = data._response[i];
+                                    tx.executeSql(
+                                        'INSERT INTO sector (idsector, nombre, tipo) VALUES (?, ?, ?)',
+                                        [ob.idsector, ob.nombre, ob.tipo]
+                                    );
+                                }
+                            }, error, function () {
+                                updated[0] = true;
+                            });
+                            
+                        });
+                        
+                        //Get the new puntos
+                        uget({
+                            url: LinkServer.Url('puntos', 'get')
+                        }).done(function (data) {
+                            db.transaction(function (tx) {
+                                for(var i in data._response) {
+                                    var ob = data._response[i];
+                                    tx.executeSql(
+                                        'INSERT INTO puntos (idpuntos, idsector, x, y) VALUES (?, ?, ?, ?)',
+                                        [ob.idpuntos, ob.idsector, ob.x, ob.y]
+                                    );
+                                }
+                            }, error, function () {
+                                updated[1] = true;
+                            });
+                            
+                        });
+                        
+                        //Get new values
+                        uget({
+                            url: LinkServer.Url('valores', 'get')
+                        }).done(function (data) {
+                            db.transaction(function (tx) {
+                                for(var i in data._response) {
+                                    var ob = data._response[i];
+                                    tx.executeSql(
+                                        'INSERT INTO valores (idvalores, idsector, mes, max, min, prom) VALUES (?, ?, ?, ?, ?, ?)',
+                                        [ob.idvalores, ob.idsector, ob.mes, ob.max, ob.min, ob.prom]
+                                    );
+                                }
+                            }, error, function () {
+                                updated[2] = true;
+                            });
+                            
+                        });
+                    } else {
+                        for(var i=0; i<updated.length; i++) {
+                            updated[i] = true;
+                        }
+                    }
+                    
+                    (function onComplete () {
+                        var sw = true;
+                        for(var i=0; i<updated.length && sw; i++) {
+                            sw = updated[i];
+                        }
+                        
+                        if(sw) {
+                            initialize();
+                        } else {
+                            setTimeout(onComplete, 150);
+                        }
+                    })();
+                });
+            }
+            
+            function generatePol () {
+                db.transaction(function (tx) {
+                    tx.executeSql('SELECT * FROM sector', [], function (_tx, result) {
+                        for(var i=0; i<result.rows.length; i++) {
+                            sectores[i] = {
+                                idsector: result.rows.item(i).idsector,
+                                nombre: result.rows.item(i).nombre,
+                                tipo: result.rows.item(i).tipo,
+                                puntos: []
+                            };
+                        }
+                    });
+                }, error, function () {
+                    db.transaction(function (tx) {
+                        for(var i in sectores) {
+                            (function (k) {
+                                tx.executeSql('SELECT * FROM puntos WHERE idsector = ?', [sectores[k].idsector], function (_tx, result) {
+                                    for(var j=0; j<result.rows.length; j++) {
+                                        var p = result.rows.item(j);
+                                        sectores[k].puntos.push(new google.maps.LatLng(p.y, p.x));
+                                    }
+                                });
+                            })(i);
+                        }
+                    }, error, function () {
+                        for(var i in sectores) {
+                            (function (j) {
+                                var polygon = new google.maps.Polygon({
+                                    paths: sectores[j].puntos,
+                                    strokeColor: '#FF0000',
+                                    strokeOpacity: 0.9,
+                                    strokeWeight: 2,
+                                    fillColor: '#FF0000',
+                                    fillOpacity: 0.35
+                                });
+                                
+                                google.maps.event.addListener(polygon, 'click', function (e) {
+                                    $.mobile.changePage($("#view-graphic"));
+                                    var range = [], prom = [];
+                                    $("#view-graphic").find("h1").html(sectores[j].nombre);
+                                    db.transaction(function (tx) {
+                                        tx.executeSql('SELECT * FROM valores WHERE idsector = ?', [sectores[j].idsector], function (tx, result) {
+                                            for(var i=0; i<result.rows.length; i++) {
+                                                var v = result.rows.item(i);
+                                                range.push([parseInt(v.mes), parseFloat(v.min), parseFloat(v.max)]);
+                                                prom.push([parseInt(v.mes), parseFloat(v.prom)]);
+                                            }
+                                            
+                                            $('#grafica').highcharts({
+                                                title: {
+                                                    text: 'Costos en el tiempo'
+                                                }, xAxis: {
+                                                    type: 'datetime'
+                                                }, yAxis: {
+                                                    title: {
+                                                        text: null
+                                                    }
+                                                }, tooltip: {
+                                                    crosshairs: true,
+                                                    shared: true,
+                                                    valueSuffix: 'COP'
+                                                }, legend: {
+                                                }, series: [{
+                                                    name: 'Precio',
+                                                    data: prom,
+                                                    zIndex: 1,
+                                                    marker: {
+                                                            fillColor: 'white',
+                                                            lineWidth: 2,
+                                                            lineColor: Highcharts.getOptions().colors[0]
+                                                    }
+                                                }, {
+                                                    name: 'Range',
+                                                    data: range,
+                                                    type: 'arearange',
+                                                    lineWidth: 0,
+                                                    linkedTo: ':previous',
+                                                    color: Highcharts.getOptions().colors[0],
+                                                    fillOpacity: 0.3,
+                                                    zIndex: 0
+                                                }]
+                                            });
+                                        });
+                                    });
+                                });
+                                
+                                polygon.setMap(map);
+                            })(i);
+                        }
+                    });
+                });
+            }
+
+            // Transaction error callback
+            function error(err) {
+                console.log(err.message);
+            }
+
+            // Transaction success callback
+            function success() {}
+
+            function initialize() {
+                //generatePol();
+            }
+        </script>
+    </head>
+    <body>
+        <div data-role="page" id="pageone">
+            <div data-role="header" data-position="fixed">
+                <a href="#dialog-filter" data-rel="popup" data-position-to="window" data-iconpos="notext" data-role="button" data-icon="bars">Equipos</a>
+                <h1>EnergyWare</h1>
+                <a href="#configurations" data-iconpos="notext" data-role="button" data-icon="calendar">Opciones</a>
+            </div>
+
+            <div data-role="content">
+                <h2 class="no-margin-center">
+                    <span id="machine-name">Nombre Equipo</span>
+                </h2>
+                
+                <h3 class="no-margin-center">
+                    <span id="hour-refresh">09:12:08</span>
+                </h3>
+                <h4 class="no-margin-center">
+                    <i class="utils-calendar"></i>
+                    <span id="date-refresh">2014-04-12</span>
+                </h4>
+                
+                <div class="full-width-slider">
+                    <label class="subtitle"><i class="utils-stats"></i> CPU:</label>
+                    <input type="range" id="cpu-usage" data-highlight="true" min="0" max="100" value="22">
+                </div>
+                
+                <div class="full-width-slider">
+                    <label class="subtitle"><i class="utils-stats"></i> RAM:</label>
+                    <input type="range" id="slider-12" data-highlight="true" min="0" max="100" value="50">
+                </div>
+                
+                <p class="subtitle"><i class="utils-stats"></i> Tráfico de Red:</p>
+                <p class="letitbigger">
+                    <span class="half">
+                        <i class="utils-download"></i> <b id="download-speed">420Kbps</b>
+                    </span>
+                    <span class="half">
+                        <i class="utils-upload"></i> <b id="upload-speed">60Kbps</b>
+                    </span>
+                </p>
+                
+                <div style="clear: both"></div>
+                
+                <p class="subtitle"><i class="utils-info"></i> Estado: <span id="pc-status">online</span></p>
+            </div>
+            
+            <div data-role="footer" data-theme="b" data-position="fixed">
+                <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
+                    <button onclick="javascript: $.mobile.changePage('#relations');" data-icon="eye">Rel.</button>
+                    <button data-icon="recycle">Suspend</button>
+                    <button data-icon="power">Power Off</button>
+                </fieldset>
+            </div>
+            
+            
+            
+            <div data-role="popup" id="dialog-filter">
+                <div data-role="header">
+                    <h1>Seleccione...</h1>
+                </div>
+                
+                <form method="post" action="demoform.asp">
+                    <div data-role="main" class="ui-content">
+                        <fieldset data-role="controlgroup">
+                            <legend>Seleccione los barrios a mostrar:</legend>
+                            <label for="red">PC 1</label>
+                            <input type="radio" name="favcolor" id="red" value="red">
+                            <label for="green">Computer 2</label>
+                            <input type="radio" name="favcolor" id="green" value="green">
+                            <label for="blue">Equipo 3</label>
+                            <input type="radio" name="favcolor" id="blue" value="blue">	
+                        </fieldset>
+                    </div>
+                    
+                    <div data-role="footer" data-theme="b">
+                        <div align="right" style="margin: 0 5px;">
+                            <button data-icon="check" >Aceptar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        
+        
+        <div data-role="page" id="relations">
+            <div data-role="header" data-position="fixed">
+                <a href="#" data-rel="back" data-iconpos="notext" data-role="button" data-icon="arrow-l">Regresar</a>
+                <h1>Relaciones</h1>
+            </div>
+
+            <div data-role="content">
+                <form class="overflow">
+                    <div class="half">
+                        <input placeholder="Código" type="text" name="code" />
+                    </div>
+
+                    <div class="half">
+                        <button style="float: right;" class="ui-btn ui-icon-plus ui-btn-icon-notext">Agregar</button>
+                    </div>
+                </form>
+                
+                <fieldset data-role="controlgroup">
+                    <legend>Equipos relacionados:</legend>
+                    <label for="pc1">PC 1</label>
+                    <input type="checkbox" name="favcolor" id="pc1" value="red">
+                    <label for="computer2">Computer 2</label>
+                    <input type="checkbox" name="favcolor" id="computer2" value="green">
+                    <label for="equipo3">Equipo 3</label>
+                    <input type="checkbox" name="favcolor" id="equipo3" value="blue">	
+                </fieldset>
+            </div>
+            
+            <div data-role="footer" data-theme="b" data-position="fixed">
+                <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
+                    <button data-icon="delete">Eliminar Relaciones</button>
+                </fieldset>
+            </div>
+        </div>
+        
+        
+        
+        <div data-role="page" id="configurations">
+            <div data-role="header" data-position="fixed">
+                <a href="#" data-rel="back" data-iconpos="notext" data-role="button" data-icon="arrow-l">Regresar</a>
+                <h1>Horarios</h1>
+            </div>
+            
+            <div data-role="content">
+                <div data-role="tabs" id="tabs">
+                    <div data-role="navbar" class="days">
+                        <ul>
+                            <li><a href="#L" data-ajax="false">L</a></li>
+                            <li><a href="#M" data-ajax="false">M</a></li>
+                            <li><a href="#X" data-ajax="false">M</a></li>
+                            <li><a href="#J" data-ajax="false">J</a></li>
+                            <li><a href="#V" data-ajax="false">V</a></li>
+                            <li><a href="#S" data-ajax="false">S</a></li>
+                            <li><a href="#D" data-ajax="false">D</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div id="one" class="ui-body-d ui-content">
+                        <div data-role="collapsible" data-theme="b" data-inset="false">
+                            <h3>Suspend</h3>
+                            <ul data-role="listview">
+                                <li><a href="#">Canary</a></li>
+                                <li><a href="#">Cat</a></li>
+                                <li><a href="#">Dog</a></li>
+                                <li><a href="#">Gerbil</a></li>
+                                <li><a href="#">Iguana</a></li>
+                                <li><a href="#">Mouse</a></li>
+                            </ul>
+                        </div><!-- /collapsible -->
+                        <div data-role="collapsible" data-theme="b" data-inset="false">
+                            <h3>Shut Down</h3>
+                            <ul data-role="listview">
+                                <li><a href="#">Chicken</a></li>
+                                <li><a href="#">Cow</a></li>
+                                <li><a href="#">Duck</a></li>
+                                <li><a href="#">Horse</a></li>
+                                <li><a href="#">Pig</a></li>
+                                <li><a href="#">Sheep</a></li>
+                            </ul>
+                        </div><!-- /collapsible -->
+                    </div>
+                </div>
+            </div>
+            
+            <div data-role="footer" data-theme="b" data-position="fixed">
+                <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
+                    <button data-icon="delete">Cancelar</button>
+                    <button data-icon="check">Aceptar</button>
+                </fieldset>
+            </div>
+        </div>
+
+        
+        
+        <div data-role="page" id="view-graphic">
+            <div data-role="header" data-position="fixed">
+                <a href="#" data-rel="back" data-iconpos="notext" data-role="button" data-icon="arrow-l">Regresar</a>
+                <h1>Grafica</h1>
+            </div>
+
+            <div data-role="content">
+                <div id="grafica"></div>
+            </div>
+        </div>
+    </body>
+</html>
