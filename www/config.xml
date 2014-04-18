@@ -12,4 +12,5 @@
     <preference name="orientation" value="portrait" />
     
     <gap:plugin name="org.apache.cordova.device" version="0.2.8" />
+    <gap:plugin name="org.apache.cordova.dialogs" version="0.2.6" />
 </widget>
