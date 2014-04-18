@@ -61,7 +61,7 @@ and open the template in the editor.
                                     display: 'block'
                                 });
                                 
-                                if(background) {
+                                if(_machine === 0 || _machine === null || background) {
                                     _machine = data._response[0].idmachine;
                                     $("#machine-name").html(data._response[0].user);
                                     History.load();
