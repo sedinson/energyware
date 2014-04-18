@@ -81,12 +81,12 @@ and open the template in the editor.
                         if(data._code === 200) {
                             Machine.load();
                         } else {
-                            navigator.notification.alert(data._message, 'Error', 'Done');
+                            navigator.notification.alert(data._message, error, 'Error', 'Done');
                         }
                     });
                 },
                 change: function (id) {
-                    navigator.notification.alert(id, 'Error', 'Done');
+                    navigator.notification.alert(id, error, 'Error', 'Done');
                     _machine = id;
                 }
             };
