@@ -6,4 +6,6 @@
     <access origin="*"/>
     <preference name="webviewbounce" value="true"/>
     <preference name="orientation" value="portrait" />
+    
+    <gap:plugin name="org.apache.cordova.device" version="0.2.8" />
 </widget>
