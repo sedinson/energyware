@@ -201,7 +201,7 @@ and open the template in the editor.
             });
             
             //Eliminar las relaciones creadas
-            function removeRelations () {
+            function remove_relations () {
                 $("#list-machine :checkbox:checked").each(function(i){
                     Machine.remove($(this).val());
                 });
