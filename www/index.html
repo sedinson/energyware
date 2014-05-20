@@ -55,33 +55,6 @@ and open the template in the editor.
                 generate: function () {
                     var tabs = $("#tabs");
                     
-                    /*<div data-role="navbar" class="days"></div>
-                    
-                    <div id="one" class="ui-body-d ui-content">
-                        <div data-role="collapsible" data-theme="b" data-inset="false">
-                            <h3>Suspend</h3>
-                            <ul data-role="listview">
-                                <li><a href="#">Canary</a></li>
-                                <li><a href="#">Cat</a></li>
-                                <li><a href="#">Dog</a></li>
-                                <li><a href="#">Gerbil</a></li>
-                                <li><a href="#">Iguana</a></li>
-                                <li><a href="#">Mouse</a></li>
-                            </ul>
-                        </div><!-- /collapsible -->
-                        <div data-role="collapsible" data-theme="b" data-inset="false">
-                            <h3>Shut Down</h3>
-                            <ul data-role="listview">
-                                <li><a href="#">Chicken</a></li>
-                                <li><a href="#">Cow</a></li>
-                                <li><a href="#">Duck</a></li>
-                                <li><a href="#">Horse</a></li>
-                                <li><a href="#">Pig</a></li>
-                                <li><a href="#">Sheep</a></li>
-                            </ul>
-                        </div><!-- /collapsible -->
-                    </div>*/
-                    
                     var navbar = $("<div/>", {
                         'data-role': 'navbar',
                         class: 'days'
@@ -105,6 +78,8 @@ and open the template in the editor.
                     
                     for(var i in Hours._h) {
                         var _h = Hours._h[i];
+                        console.log(_h);
+                        
                         var day = $("<div/>", {
                             class: 'ui-body-d ui-content',
                             id: _h.n
@@ -293,6 +268,7 @@ and open the template in the editor.
                         version  : device.version
                     }
                 }).done(function (data) {
+                    Hours.generate();
                     Machine.load();
                     History.auto();
                 });
