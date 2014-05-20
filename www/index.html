@@ -42,6 +42,119 @@ and open the template in the editor.
                 }
             };
             
+            var Hours = {
+                _h: [
+                    {n: "L", v: "L"},
+                    {n: "M", v: "M"},
+                    {n: "X", v: "M"},
+                    {n: "J", v: "J"},
+                    {n: "V", v: "V"},
+                    {n: "S", v: "S"},
+                    {n: "D", v: "D"}
+                ],
+                generate: function () {
+                    var tabs = $("#tabs");
+                    
+                    /*<div data-role="navbar" class="days"></div>
+                    
+                    <div id="one" class="ui-body-d ui-content">
+                        <div data-role="collapsible" data-theme="b" data-inset="false">
+                            <h3>Suspend</h3>
+                            <ul data-role="listview">
+                                <li><a href="#">Canary</a></li>
+                                <li><a href="#">Cat</a></li>
+                                <li><a href="#">Dog</a></li>
+                                <li><a href="#">Gerbil</a></li>
+                                <li><a href="#">Iguana</a></li>
+                                <li><a href="#">Mouse</a></li>
+                            </ul>
+                        </div><!-- /collapsible -->
+                        <div data-role="collapsible" data-theme="b" data-inset="false">
+                            <h3>Shut Down</h3>
+                            <ul data-role="listview">
+                                <li><a href="#">Chicken</a></li>
+                                <li><a href="#">Cow</a></li>
+                                <li><a href="#">Duck</a></li>
+                                <li><a href="#">Horse</a></li>
+                                <li><a href="#">Pig</a></li>
+                                <li><a href="#">Sheep</a></li>
+                            </ul>
+                        </div><!-- /collapsible -->
+                    </div>*/
+                    
+                    var navbar = $("<div/>", {
+                        'data-role': 'navbar',
+                        class: 'days'
+                    }), ul = $("<ul/>");
+                
+                    for(var i in Hours._h) {
+                        var _h = Hours._h[i];
+                        ul.append(
+                            $("<li/>").html(
+                                $("<a/>", {
+                                    'data-ajax': false,
+                                    href: "#" + _h.n,
+                                    html: _h.v
+                                })
+                            )
+                        );
+                    }
+                    
+                    navbar.html(ul);
+                    tabs.html(navbar);
+                    
+                    for(var i in Hours._h) {
+                        var _h = Hours._h[i];
+                        var day = $("<div/>", {
+                            class: 'ui-body-d ui-content',
+                            id: _h.n
+                        });
+                        
+                        var suspend = $("<ul>", {
+                            'data-role': 'listview'
+                        }),
+                        shutdown = $("<ul>", {
+                            'data-role': 'listview'
+                        });
+                        
+                        
+                        for(var j=0; j<12; j++) {
+                            for(var k=0; k<30; k+=30) {
+                                var id = "h" + j + "-" + k,
+                                    hour = j + ":" + k;
+                                suspend.append(
+                                    "<label for='" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id='" + id + "' value='" + hour + "'>"
+                                );
+                        
+                                shutdown.append(
+                                    "<label for='" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id='" + id + "' value='" + hour + "'>"
+                                );
+                            }
+                        }
+                        
+                        $("<div/>", {
+                            'data-role': 'collapsible',
+                            'data-theme': 'b',
+                            'data-inset': false,
+                            html: '<h3>Suspend</h3>'
+                        }).append(
+                            suspend
+                        ).appendTo(day);
+
+                        $("<div/>", {
+                            'data-role': 'collapsible',
+                            'data-theme': 'b',
+                            'data-inset': false,
+                            html: '<h3>Shut Down</h3>'
+                        }).append(
+                            shutdown
+                        ).appendTo(day);
+                
+                        day.appendTo(tabs);
+                    }
+                }
+            };
+            
             var Machine = {
                 load: function () {
                     uget({
@@ -348,44 +461,7 @@ and open the template in the editor.
             </div>
             
             <div data-role="content">
-                <div data-role="tabs" id="tabs">
-                    <div data-role="navbar" class="days">
-                        <ul>
-                            <li><a href="#L" data-ajax="false">L</a></li>
-                            <li><a href="#M" data-ajax="false">M</a></li>
-                            <li><a href="#X" data-ajax="false">M</a></li>
-                            <li><a href="#J" data-ajax="false">J</a></li>
-                            <li><a href="#V" data-ajax="false">V</a></li>
-                            <li><a href="#S" data-ajax="false">S</a></li>
-                            <li><a href="#D" data-ajax="false">D</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div id="one" class="ui-body-d ui-content">
-                        <div data-role="collapsible" data-theme="b" data-inset="false">
-                            <h3>Suspend</h3>
-                            <ul data-role="listview">
-                                <li><a href="#">Canary</a></li>
-                                <li><a href="#">Cat</a></li>
-                                <li><a href="#">Dog</a></li>
-                                <li><a href="#">Gerbil</a></li>
-                                <li><a href="#">Iguana</a></li>
-                                <li><a href="#">Mouse</a></li>
-                            </ul>
-                        </div><!-- /collapsible -->
-                        <div data-role="collapsible" data-theme="b" data-inset="false">
-                            <h3>Shut Down</h3>
-                            <ul data-role="listview">
-                                <li><a href="#">Chicken</a></li>
-                                <li><a href="#">Cow</a></li>
-                                <li><a href="#">Duck</a></li>
-                                <li><a href="#">Horse</a></li>
-                                <li><a href="#">Pig</a></li>
-                                <li><a href="#">Sheep</a></li>
-                            </ul>
-                        </div><!-- /collapsible -->
-                    </div>
-                </div>
+                <div data-role="tabs" id="tabs"></div>
             </div>
             
             <div data-role="footer" data-theme="b" data-position="fixed">
