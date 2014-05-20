@@ -93,16 +93,16 @@ and open the template in the editor.
                         });
                         
                         
-                        for(var j=0; j<12; j++) {
-                            for(var k=0; k<30; k+=30) {
+                        for(var j=0; j<24; j++) {
+                            for(var k=0; k<=30; k+=30) {
                                 var id = "h" + j + "-" + k,
                                     hour = j + ":" + k;
                                 suspend.append(
-                                    "<label for='" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id='" + id + "' value='" + hour + "'>"
+                                    "<label for='suspend-" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id='suspend-" + id + "' value='a," + hour + "'>"
                                 );
                         
                                 shutdown.append(
-                                    "<label for='" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id='" + id + "' value='" + hour + "'>"
+                                    "<label for='shutdown-" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id=shutdown-'" + id + "' value='b," + hour + "'>"
                                 );
                             }
                         }
