@@ -94,8 +94,8 @@ and open the template in the editor.
                                     var ob = data._response[i];
                                     
                                     dates.push(ob.date);
-                                    down.push(ob.download);
-                                    up.push(ob.upload);
+                                    down.push(parseFloat(ob.download));
+                                    up.push(parseFloat(ob.upload));
                                 }
                                 
                                 options.xAxis.categories = dates;
@@ -116,7 +116,7 @@ and open the template in the editor.
                                     var ob = data._response[i];
                                     
                                     dates.push(ob.date);
-                                    cpu.push(ob.cpu);
+                                    cpu.push(parseFloat(ob.cpu));
                                 }
                                 
                                 options.xAxis.categories = dates;
@@ -133,7 +133,7 @@ and open the template in the editor.
                                     var ob = data._response[i];
                                     
                                     dates.push(ob.date);
-                                    ram.push(ob.ram);
+                                    ram.push(parseFloat(ob.ram));
                                 }
                                 
                                 options.xAxis.categories = dates;
