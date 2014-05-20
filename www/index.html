@@ -96,7 +96,7 @@ and open the template in the editor.
                         
                         for(var j=0; j<24; j++) {
                             for(var k=0; k<=30; k+=30) {
-                                var id = "h" + j + "-" + k,
+                                var id = _h.n + "-" + j + "-" + k,
                                     hour = j + ":" + k;
                                 suspend.append(
                                     "<label for='suspend-" + id + "'>" + hour + "</label><input type='checkbox' name='hour' id='suspend-" + id + "' value='" + hour + "' />"
