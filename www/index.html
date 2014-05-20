@@ -78,7 +78,6 @@ and open the template in the editor.
                     
                     for(var i in Hours._h) {
                         var _h = Hours._h[i];
-                        console.log(_h);
                         
                         var day = $("<div/>", {
                             class: 'ui-body-d ui-content',
@@ -128,6 +127,49 @@ and open the template in the editor.
                 
                         day.appendTo(tabs);
                     }
+                    alert("Created!");
+                },
+                
+                save: function () {
+                    var json = {};
+                    for(var i in Hours._h) {
+                        var _h = Hours._h[i];
+                        
+                        json[_h.n] = {
+                            shutdown: [],
+                            suspend: []
+                        };
+                        
+                        var checks = $("#shutdown-" + _h.n).find("input");
+                        checks.each(function (j) {
+                            if($(this).is(':checked')) {
+                                json[_h.n].shutdown.push($(this).val());
+                            }
+                        });
+                        
+                        var checks = $("#suspend-" + _h.n).find("input");
+                        checks.each(function (j) {
+                            if($(this).is(':checked')) {
+                                json[_h.n].suspend.push($(this).val());
+                            }
+                        });
+                    }
+                    
+                    uget({
+                        type: 'POST',
+                        url: LinkServer.Url('machine', 'hours', []),
+                        data: {
+                            iduser: device.uuid,
+                            idmachine: _machine,
+                            hours: JSON.stringify(json)
+                        }
+                    }).done(function (data) {
+                        if(data._code === 200) {
+                            alert("Changes saved!" + _machine);
+                        } else {
+                            alert(data._message);
+                        }
+                    });
                 }
             };
             
