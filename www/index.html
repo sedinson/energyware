@@ -42,6 +42,83 @@ and open the template in the editor.
                 }
             };
             
+            var Grapics = {
+                show: function (info) {
+                    $.mobile.changePage("#view-graphic");
+                    
+                    var options = {
+                        title: {
+                            text: 'Title Example',
+                            x: -20 //center
+                        },
+                        subtitle: {
+                            text: 'Source: a Source',
+                            x: -20
+                        },
+                        xAxis: {
+                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Temperature (°C)'
+                            },
+                            plotLines: [{
+                                value: 0,
+                                width: 1,
+                                color: '#808080'
+                            }]
+                        },
+                        tooltip: {
+                            valueSuffix: '°C'
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'bottom',
+                            borderWidth: 0
+                        },
+                        series: []
+                    };
+                    
+                    uget({
+                        url: LinkServer.Url('history', 'get', {
+                            iduser: device.uuid,
+                            idmachine: _machine
+                        })
+                    }).done(function (data) {
+                        if(data._code === 200) {
+                            if(info == "net") {
+                                options.title = "Network Status";
+                                var up = [], down = [], dates = [];
+                                for(var i=0; i<data._response.length; i++) {
+                                    var ob = data._response[i];
+                                    
+                                    dates.push(ob.date);
+                                    down.push(ob.download);
+                                    up.push(ob.upload);
+                                }
+                                
+                                options.xAxis.categories = dates;
+                                options.yAxis.title = "Kbps";
+                                
+                                options.series.push({
+                                    name: 'download',
+                                    data: down
+                                });
+                                options.series.push({
+                                    name: 'upload',
+                                    data: up
+                                });
+                            }
+                            
+                            $("#grafica").highcharts(options);
+                        } else {
+                            alert(data._message);
+                        }
+                    });
+                }
+            };
+            
             var Hours = {
                 _h: [
                     {n: "L", v: "L"},
@@ -127,7 +204,6 @@ and open the template in the editor.
                 
                         day.appendTo(tabs);
                     }
-                    alert("Created!");
                 },
                 
                 save: function () {
@@ -398,7 +474,7 @@ and open the template in the editor.
                     </div>
 
                     <p class="subtitle"><i class="utils-stats"></i> Tráfico de Red:</p>
-                    <p class="letitbigger">
+                    <p class="letitbigger" onclick="javascript: Grapics.show('net');">
                         <span class="half">
                             <i class="utils-download"></i> <b id="download-speed">0Kbps</b>
                         </span>
