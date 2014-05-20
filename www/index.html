@@ -82,8 +82,8 @@ and open the template in the editor.
                     
                     uget({
                         url: LinkServer.Url('history', 'get', {
-                            iduser: device.uuid,
-                            idmachine: _machine
+                            uuid: device.uuid,
+                            machine: _machine
                         })
                     }).done(function (data) {
                         if(data._code === 200) {
@@ -108,6 +108,40 @@ and open the template in the editor.
                                 options.series.push({
                                     name: 'upload',
                                     data: up
+                                });
+                            } else if (info == "cpu") {
+                                options.title = "CPU Usage";
+                                var cpu = [], dates = [];
+                                for(var i=0; i<data._response.length; i++) {
+                                    var ob = data._response[i];
+                                    
+                                    dates.push(ob.date);
+                                    cpu.push(ob.cpu);
+                                }
+                                
+                                options.xAxis.categories = dates;
+                                options.yAxis.title = "MB";
+                                
+                                options.series.push({
+                                    name: 'CPU Usage',
+                                    data: cpu
+                                });
+                            } else if (info == "ram") {
+                                options.title = "RAM Usage";
+                                var ram = [], dates = [];
+                                for(var i=0; i<data._response.length; i++) {
+                                    var ob = data._response[i];
+                                    
+                                    dates.push(ob.date);
+                                    ram.push(ob.ram);
+                                }
+                                
+                                options.xAxis.categories = dates;
+                                options.yAxis.title = "MB";
+                                
+                                options.series.push({
+                                    name: 'RAM Usage',
+                                    data: ram
                                 });
                             }
                             
@@ -463,12 +497,12 @@ and open the template in the editor.
                         <span id="date-refresh">0000-00-00</span>
                     </h4>
 
-                    <div class="full-width-slider">
+                    <div class="full-width-slider" onclick="javascript: Grapics.show('cpu');">
                         <label class="subtitle"><i class="utils-stats"></i> CPU:</label>
                         <input type="range" id="cpu-usage" data-highlight="true" min="0" max="100" value="0">
                     </div>
 
-                    <div class="full-width-slider">
+                    <div class="full-width-slider" onclick="javascript: Grapics.show('ram');">
                         <label class="subtitle"><i class="utils-stats"></i> RAM:</label>
                         <input type="range" id="ram-usage" data-highlight="true" min="0" max="100" value="0">
                     </div>
