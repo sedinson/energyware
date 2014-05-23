@@ -12,6 +12,7 @@ and open the template in the editor.
         <link rel="stylesheet" href="res/jquery-mobile.min.css" />
         <link rel="stylesheet" href="res/style.css" />
         <link rel="stylesheet" href="res/utils.css" />
+        <link rel="stylesheet" href="res/morris.min.css" />
 
         <!--Cordova library and plugins-->
         <script type="text/javascript" src="cordova.js"></script>
@@ -452,7 +453,7 @@ and open the template in the editor.
     </head>
     <body>
         <div data-role="page" id="pageone">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#" onclick="javascript: Pages.machine();" data-rel="popup" data-position-to="window" data-iconpos="notext" data-role="button" data-icon="bars">Equipos</a>
                 <h1>EnergyWare</h1>
                 <a href="#configurations" data-iconpos="notext" data-role="button" data-icon="calendar">Opciones</a>
@@ -502,7 +503,7 @@ and open the template in the editor.
                 </div>
             </div>
             
-            <div data-role="footer" data-theme="b" data-position="fixed">
+            <div data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
                 <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
                     <button onclick="javascript: Pages.relations();" data-icon="eye">Rel.</button>
                     <button data-icon="recycle">Suspend</button>
@@ -534,7 +535,7 @@ and open the template in the editor.
         
         
         <div data-role="page" id="relations">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#" data-rel="back" data-iconpos="notext" data-role="button" data-icon="arrow-l">Regresar</a>
                 <h1>Relaciones</h1>
             </div>
@@ -553,7 +554,7 @@ and open the template in the editor.
                 <fieldset data-role="controlgroup" id="list-machine"></fieldset>
             </div>
             
-            <div data-role="footer" data-theme="b" data-position="fixed">
+            <div data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
                 <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
                     <button data-icon="delete" onclick="javascript: remove_relations();">Eliminar Relaciones</button>
                 </fieldset>
@@ -563,7 +564,7 @@ and open the template in the editor.
         
         
         <div data-role="page" id="configurations">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#" data-rel="back" data-iconpos="notext" data-role="button" data-icon="arrow-l">Regresar</a>
                 <h1>Horarios</h1>
             </div>
@@ -572,7 +573,7 @@ and open the template in the editor.
                 <div data-role="tabs" id="tabs"></div>
             </div>
             
-            <div data-role="footer" data-theme="b" data-position="fixed">
+            <div data-role="footer" data-theme="b" data-position="fixed" data-tap-toggle="false">
                 <fieldset class="full subbuttons" data-role="controlgroup" data-type="horizontal">
                     <button data-icon="delete" data-rel="back" >Cancelar</button>
                     <button data-icon="check" onclick="javascript: Hours.save();">Aceptar</button>
@@ -583,7 +584,7 @@ and open the template in the editor.
         
         
         <div data-role="page" id="view-graphic">
-            <div data-role="header" data-position="fixed">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false">
                 <a href="#" data-rel="back" data-iconpos="notext" data-role="button" data-icon="arrow-l">Regresar</a>
                 <h1>Grafica</h1>
             </div>
