@@ -19,8 +19,9 @@ and open the template in the editor.
         <!--Another libraries-->
         <script type="text/javascript" src="libs/js/jquery.min.js"></script>
         <script type="text/javascript" src="libs/js/jquery-mobile.min.js"></script>
-        <script type="text/javascript" src="libs/js/highcharts.js"></script>
-        <script type="text/javascript" src="libs/js/highcharts-more.js"></script>
+        <script type="text/javascript" src="libs/js/modernizr.custom.js"></script>
+        <script type="text/javascript" src="libs/js/raphael.min.js"></script>
+        <script type="text/javascript" src="libs/js/morris.min.js"></script>
         <script type="text/javascript" src="libs/js/projectbase.js"></script>
         
         <!--Main code-->
@@ -46,38 +47,6 @@ and open the template in the editor.
                 show: function (info) {
                     $.mobile.changePage("#view-graphic");
                     
-                    var options = {
-                        title: {
-                            text: 'Title Example',
-                            x: -20 //center
-                        },
-                        subtitle: {
-                            text: 'Source: a Source',
-                            x: -20
-                        },
-                        xAxis: {
-                            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                        },
-                        yAxis: {
-                            title: {
-                                text: 'Temperature (°C)'
-                            },
-                            plotLines: [{
-                                value: 0,
-                                width: 1,
-                                color: '#808080'
-                            }]
-                        },
-                        tooltip: {
-                            valueSuffix: '%'
-                        },
-                        legend: {
-                            align: 'bottom'
-                        },
-                        series: []
-                    };
-                    
                     uget({
                         url: LinkServer.Url('history', 'get', {
                             uuid: device.uuid,
@@ -85,65 +54,57 @@ and open the template in the editor.
                         })
                     }).done(function (data) {
                         if(data._code === 200) {
+                            var tmp = [], ykeys = [], labels = [];
+                            
                             if(info == "net") {
-                                options.title = "Network Status";
-                                var up = [], down = [], dates = [];
+                                ykeys = ['up', 'down'];
+                                labels = ['upload', 'download'];
+                                
                                 for(var i=0; i<data._response.length; i++) {
                                     var ob = data._response[i];
                                     
-                                    dates.push(ob.date);
-                                    down.push(parseFloat(ob.download));
-                                    up.push(parseFloat(ob.upload));
+                                    tmp.push({
+                                        date    : ob.date,
+                                        up      : parseFloat(ob.upload),
+                                        down    : parseFloat(ob.download)
+                                    });
                                 }
-                                
-                                options.xAxis.categories = dates;
-                                options.yAxis.title = "Kbps";
-                                
-                                options.series.push({
-                                    name: 'download',
-                                    data: down
-                                });
-                                options.series.push({
-                                    name: 'upload',
-                                    data: up
-                                });
                             } else if (info == "cpu") {
-                                options.title = "CPU Usage";
-                                var cpu = [], dates = [];
+                                ykeys = ['cpu'];
+                                labels = ['CPU usage'];
+                                
                                 for(var i=0; i<data._response.length; i++) {
                                     var ob = data._response[i];
                                     
-                                    dates.push(ob.date);
-                                    cpu.push(parseFloat(ob.cpu));
+                                    tmp.push({
+                                        date    : ob.date,
+                                        cpu     : parseFloat(ob.cpu)
+                                    });
                                 }
-                                
-                                options.xAxis.categories = dates;
-                                
-                                options.series.push({
-                                    name: 'CPU Usage',
-                                    data: cpu
-                                });
                             } else if (info == "ram") {
-                                options.title = "RAM Usage";
-                                var ram = [], dates = [];
+                                ykeys = ['ram'];
+                                labels = ['RAM usage'];
+                                
                                 for(var i=0; i<data._response.length; i++) {
                                     var ob = data._response[i];
                                     
-                                    dates.push(ob.date);
-                                    ram.push(parseFloat(ob.ram));
+                                    tmp.push({
+                                        date    : ob.date,
+                                        ram     : parseFloat(ob.ram)
+                                    });
                                 }
-                                
-                                options.xAxis.categories = dates;
-                                
-                                options.series.push({
-                                    name: 'RAM Usage',
-                                    data: ram
-                                });
                             }
                             
                             setTimeout(function () {
-                                $("#grafica").highcharts(options);
-                            }, 1000);
+                                Morris.Bar({
+                                    element: 'grafica',
+                                    data: tmp,
+                                    xkey: 'date',
+                                    ykeys: ykeys,
+                                    axes: false,
+                                    labels: labels
+                                });
+                            }, 500);
                         } else {
                             alert(data._message);
                         }
