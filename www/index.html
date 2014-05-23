@@ -46,6 +46,7 @@ and open the template in the editor.
             var Grapics = {
                 show: function (info) {
                     $.mobile.changePage("#view-graphic");
+                    $("#grafica").empty();
                     
                     uget({
                         url: LinkServer.Url('history', 'get', {
@@ -69,6 +70,16 @@ and open the template in the editor.
                                         down    : parseFloat(ob.download)
                                     });
                                 }
+                                
+                                setTimeout(function () {
+                                    Morris.Line({
+                                        element: 'grafica',
+                                        data: tmp,
+                                        xkey: 'date',
+                                        ykeys: ykeys,
+                                        labels: labels
+                                    });
+                                }, 500);
                             } else if (info == "cpu") {
                                 ykeys = ['cpu'];
                                 labels = ['CPU usage'];
@@ -81,6 +92,16 @@ and open the template in the editor.
                                         cpu     : parseFloat(ob.cpu)
                                     });
                                 }
+                                
+                                setTimeout(function () {
+                                    Morris.Bar({
+                                        element: 'grafica',
+                                        data: tmp,
+                                        xkey: 'date',
+                                        ykeys: ykeys,
+                                        labels: labels
+                                    });
+                                }, 500);
                             } else if (info == "ram") {
                                 ykeys = ['ram'];
                                 labels = ['RAM usage'];
@@ -93,18 +114,17 @@ and open the template in the editor.
                                         ram     : parseFloat(ob.ram)
                                     });
                                 }
+                                
+                                setTimeout(function () {
+                                    Morris.Bar({
+                                        element: 'grafica',
+                                        data: tmp,
+                                        xkey: 'date',
+                                        ykeys: ykeys,
+                                        labels: labels
+                                    });
+                                }, 500);
                             }
-                            
-                            $("#grafica").empty();
-                            setTimeout(function () {
-                                Morris.Line({
-                                    element: 'grafica',
-                                    data: tmp,
-                                    xkey: 'date',
-                                    ykeys: ykeys,
-                                    labels: labels
-                                });
-                            }, 500);
                         } else {
                             alert(data._message);
                         }
