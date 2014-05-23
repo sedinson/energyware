@@ -70,12 +70,10 @@ and open the template in the editor.
                             }]
                         },
                         tooltip: {
-                            valueSuffix: '°C'
+                            valueSuffix: '%'
                         },
                         legend: {
-                            layout: 'vertical',
-                            align: 'bottom',
-                            borderWidth: 0
+                            align: 'bottom'
                         },
                         series: []
                     };
@@ -94,7 +92,6 @@ and open the template in the editor.
                                     var ob = data._response[i];
                                     
                                     dates.push(ob.date);
-                                    console.log(ob.download + " : " + parseFloat(ob.download));
                                     down.push(parseFloat(ob.download));
                                     up.push(parseFloat(ob.upload));
                                 }
@@ -121,7 +118,6 @@ and open the template in the editor.
                                 }
                                 
                                 options.xAxis.categories = dates;
-                                options.yAxis.title = "MB";
                                 
                                 options.series.push({
                                     name: 'CPU Usage',
@@ -138,7 +134,6 @@ and open the template in the editor.
                                 }
                                 
                                 options.xAxis.categories = dates;
-                                options.yAxis.title = "MB";
                                 
                                 options.series.push({
                                     name: 'RAM Usage',
@@ -146,7 +141,9 @@ and open the template in the editor.
                                 });
                             }
                             
-                            $("#grafica").highcharts(options);
+                            setTimeout(function () {
+                                $("#grafica").highcharts(options);
+                            }, 1000);
                         } else {
                             alert(data._message);
                         }
