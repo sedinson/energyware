@@ -97,12 +97,11 @@ and open the template in the editor.
                             
                             $("#grafica").empty();
                             setTimeout(function () {
-                                Morris.Bar({
+                                Morris.Line({
                                     element: 'grafica',
                                     data: tmp,
                                     xkey: 'date',
                                     ykeys: ykeys,
-                                    axes: false,
                                     labels: labels
                                 });
                             }, 500);
