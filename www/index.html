@@ -60,9 +60,9 @@ and open the template in the editor.
                             
                             if(info == "net") {
                                 ykeys = ['up', 'down'];
-                                labels = ['upload', 'download'];
+                                labels = ['Kbps Upload', 'Kbps Download'];
                                 
-                                for(var i=0; i<data._response.length; i++) {
+                                for(var i=data._response.length-1; i>= 0; i--) {
                                     var ob = data._response[i];
                                     
                                     tmp.push({
@@ -83,9 +83,9 @@ and open the template in the editor.
                                 }, 500);
                             } else if (info == "cpu") {
                                 ykeys = ['cpu'];
-                                labels = ['CPU usage'];
+                                labels = ['% CPU usage'];
                                 
-                                for(var i=0; i<data._response.length; i++) {
+                                for(var i=data._response.length-1; i>= 0; i--) {
                                     var ob = data._response[i];
                                     
                                     tmp.push({
@@ -105,9 +105,9 @@ and open the template in the editor.
                                 }, 500);
                             } else if (info == "ram") {
                                 ykeys = ['ram'];
-                                labels = ['RAM usage'];
+                                labels = ['% RAM usage'];
                                 
-                                for(var i=0; i<data._response.length; i++) {
+                                for(var i=data._response.length-1; i>= 0; i--) {
                                     var ob = data._response[i];
                                     
                                     tmp.push({
