@@ -94,6 +94,7 @@ and open the template in the editor.
                                     var ob = data._response[i];
                                     
                                     dates.push(ob.date);
+                                    console.log(ob.download + " : " + parseFloat(ob.download));
                                     down.push(parseFloat(ob.download));
                                     up.push(parseFloat(ob.upload));
                                 }
